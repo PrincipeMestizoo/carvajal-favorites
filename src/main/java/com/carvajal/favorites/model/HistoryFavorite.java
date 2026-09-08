@@ -1,12 +1,26 @@
 package com.carvajal.favorites.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
+import com.carvajal.favorites.enums.ActionType;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * Historico inmutable de cada accion (agregar/actualizar/eliminar)
+ * realizada sobre un item de la lista de deseos.
+ */
+@Entity
+@Table(name = "history_favorite")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class HistoryFavorite {
 
     @Id
@@ -17,15 +31,17 @@ public class HistoryFavorite {
     @Column(name = "id_item_favorite", nullable = false)
     private Long idItemFavorite;
 
-    @Column(name = "action", nullable = false)
-    private String action;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action", nullable = false, length = 20)
+    private ActionType action;
 
     @Column(name = "date_action", nullable = false)
     private LocalDateTime dateAction;
 
-    public HistoryFavorite(Long idItemFavorite, String action, LocalDateTime dateAction) {
-        this.idItemFavorite = idItemFavorite;
-        this.action = action;
-        this.dateAction = dateAction;
+    @PrePersist
+    public void prePersist() {
+        if (this.dateAction == null) {
+            this.dateAction = LocalDateTime.now();
+        }
     }
 }

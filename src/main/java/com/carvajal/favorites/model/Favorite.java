@@ -1,26 +1,28 @@
 package com.carvajal.favorites.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.carvajal.favorites.enums.FavoriteState;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Audited;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
+/**
+ * Item de la lista de deseos de un usuario.
+ * Mapea la tabla "favorite" dentro de la base de datos compartida del e-commerce.
+ */
 @Entity
-@Audited.Table(name = "favorites")
+@Table(name = "favorite")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Favorite {
 
-    @jakarta.persistence.Id
-    private Long id;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_item_favorite")
@@ -35,17 +37,20 @@ public class Favorite {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "state", nullable = false)
-    private String state;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", nullable = false, length = 20)
+    private FavoriteState state;
 
     @Column(name = "date_save", nullable = false)
     private LocalDateTime dateSave;
 
-    public Favorite(Long idUser, Long idProduct, Integer quantity, String state, LocalDateTime dateSave) {
-        this.idUser = idUser;
-        this.idProduct = idProduct;
-        this.quantity = quantity;
-        this.state = state;
-        this.dateSave = dateSave;
+    @PrePersist
+    public void prePersist() {
+        if (this.dateSave == null) {
+            this.dateSave = LocalDateTime.now();
+        }
+        if (this.state == null) {
+            this.state = FavoriteState.DISPONIBLE;
+        }
     }
 }
