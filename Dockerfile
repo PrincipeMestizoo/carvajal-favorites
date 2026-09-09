@@ -2,13 +2,11 @@
 FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
-# Copiar archivos de configuración de Maven y código fuente
+# Copiar archivos de configuración y código fuente necesarios
 COPY pom.xml ./
+COPY .mvn .mvn
 COPY mvnw ./
 COPY src ./src
-
-# Si tu proyecto usa la carpeta .mvn, descomenta la siguiente línea:
-# COPY .mvn .mvn
 
 # Dar permisos de ejecución al wrapper y empaquetar la app
 RUN chmod +x mvnw
