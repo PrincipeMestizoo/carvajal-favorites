@@ -1,22 +1,17 @@
-# Etapa 1: Compilación con Maven global y Java 21 (o cambia a la versión que use tu proyecto)
-FROM eclipse-temurin:25-alpine AS build
+# ---------- Etapa 1: build ----------
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
 
-# Instalar maven para compilar directamente
-RUN apt-get update && apt-get install -y maven
+COPY pom.xml .
+RUN mvn -B -q dependency:go-offline
 
-# Copiar el pom.xml y el código fuente
-COPY pom.xml ./
 COPY src ./src
+RUN mvn -B -q clean package -DskipTests
 
-# Compilar usando mvn directamente (sin depender del wrapper)
-RUN mvn clean package -DskipTests
-
-# Etapa 2: Imagen ligera para ejecución
-FROM eclipse-temurin:21-jre-jammy
+# ---------- Etapa 2: runtime ----------
+FROM eclipse-temurin:25-jre AS runtime
 WORKDIR /app
 
-# Copiar el jar generado desde la etapa de compilación
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
