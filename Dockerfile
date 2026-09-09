@@ -2,13 +2,15 @@
 FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
-# Copiar los archivos de configuración de Maven y el código fuente
+# Copiar archivos de configuración de Maven y código fuente
 COPY pom.xml ./
-COPY .mvn .mvn
 COPY mvnw ./
-COPY src src
+COPY src ./src
 
-# Dar permisos de ejecución al wrapper de Maven y empaquetar la app
+# Si tu proyecto usa la carpeta .mvn, descomenta la siguiente línea:
+# COPY .mvn .mvn
+
+# Dar permisos de ejecución al wrapper y empaquetar la app
 RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
@@ -16,11 +18,8 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-# Copiar el jar generado desde la etapa de compilación
+# Copiar el jar generado
 COPY --from=build /app/target/*.jar app.jar
 
-# Render asigna dinámicamente un puerto mediante la variable PORT
 EXPOSE 8080
-
-# Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
