@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Entidad de SOLO LECTURA sobre la tabla "product", que en realidad
+ * Entidad de SOLO LECTURA sobre la tabla "products", que en realidad
  * es propiedad del microservicio de Catalogo/Producto.
  *
  * Como todos los microservicios comparten la misma base de datos,
@@ -19,7 +19,7 @@ import lombok.Setter;
  * tabla desde este microservicio.
  */
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
